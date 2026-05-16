@@ -31,7 +31,7 @@ const RoomScreen = ({ onJoin }) => {
             padding: 24,
             background: '#f4f9f9'
         }}>
-            <h2 style={{ margin: 0, fontSize: 30, fontWeight: 600 }}>DEVICE LOCATION SHARING PLATFORM</h2>
+            <h2 style={{ margin: 0, fontSize: 30, fontWeight: 600 }}>Geotrace — A Location Sharing Platform</h2>
             <p style={{ margin: 0, color: '#6b7280', textAlign: 'center' }}>
                 Create a room and share the ID with a friend
             </p>
