@@ -1,10 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
-import dynamic from 'next/dynamic'
-
-
-
 import "leaflet/dist/leaflet.css"
 import "leaflet-defaulticon-compatibility"
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
@@ -35,14 +31,14 @@ export default function Map({ roomId }) {
 
         let cancelled = false
 
-        const finalUrl ='wss://geo-trace-v1-server.onrender.com/ws'
+        const finalUrl = 'wss://geo-trace-v1-server.onrender.com/ws'
+        // const finalUrl = "ws://localhost:4001/ws"
         const ws = new WebSocket(`${finalUrl}?roomId=${roomId}`)
         let watchId
 
         ws.onopen = () => {
             setConnected(true)
-            console.log('✅ WebSocket connected')
-
+            console.log('WEBSOCKET CONNECTED')
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
                     const { latitude, longitude } = pos.coords
@@ -77,27 +73,23 @@ export default function Map({ roomId }) {
 
         ws.onclose = () => {
             setConnected(false)
-            console.log("❌ WebSocket disconnected")
+            console.log("WEBSOCKET DISCONNECTED")
         }
 
         ws.onerror = (error) => {
-            console.error("❌ WebSocket error:", error)
             setConnected(false)
         }
 
         return () => {
             cancelled = true
             if (watchId) navigator.geolocation.clearWatch(watchId)
-            if (ws.readyState !== WebSocket.CLOSING && ws.readyState !== WebSocket.CLOSED) {
-                ws.close()
-            }
+            ws.close()
         }
     }, [roomId])
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
 
-            {/* Top bar — Room ID + copy button */}
             <div style={{
                 position: 'fixed', top: 10, left: '50%',
                 transform: 'translateX(-50%)', zIndex: 9999,
@@ -123,44 +115,41 @@ export default function Map({ roomId }) {
                     padding: '4px 10px', cursor: 'pointer', fontSize: 12,
                     transition: 'all 0.2s'
                 }}>
-                    {copied ? '✓ Copied!' : 'Copy ID'}
+                    {copied ? 'Copied!' : 'Copy'}
                 </button>
             </div>
 
-            {/* Bottom debug overlay */}
             <div style={{
                 position: 'fixed', bottom: 10, left: 10, zIndex: 9999,
                 background: 'rgba(0,0,0,0.7)', color: 'white',
                 padding: '8px 12px', borderRadius: 8,
                 fontFamily: 'monospace', fontSize: 13, lineHeight: 1.6
             }}>
-                📍 You: {position[0].toFixed(5)}, {position[1].toFixed(5)}
+                You: {position[0].toFixed(5)}, {position[1].toFixed(5)}
                 <br />
-                👥 Others in room: {Object.keys(otherUsers).length}
+                Others in room: {Object.keys(otherUsers).length}
                 <br />
-                {connected ? '🟢 Connected' : '🔴 Disconnected'}
+                {connected ? 'CONNECTED' : 'DISCONNECTED'}
             </div>
 
             <MapContainer
                 center={[20, 0]}
-                zoom={2}
+                zoom={15}
                 scrollWheelZoom={true}
                 style={{ height: '100vh', width: '100%' }}
             >
                 <RecentMap position={position} />
                 <TileLayer url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
 
-                {/* Your own marker */}
                 {position[0] !== 0 && (
                     <Marker position={position}>
-                        <Popup>📍 You</Popup>
+                        <Popup>You</Popup>
                     </Marker>
                 )}
 
-                {/* Other users' markers */}
                 {Object.entries(otherUsers).map(([id, pos]) => (
                     <Marker key={id} position={pos}>
-                        <Popup>👤 User {id.slice(0, 6)}</Popup>
+                        <Popup>User {id.slice(0, 6)}</Popup>
                     </Marker>
                 ))}
             </MapContainer>

@@ -5,7 +5,6 @@ const fastify = Fastify()
 
 await fastify.register(websocket)
 
-const clients = new Map()
 const rooms = new Map()
 fastify.get("/ws", { websocket: true }, (socket, request) => {
 
@@ -17,7 +16,6 @@ fastify.get("/ws", { websocket: true }, (socket, request) => {
     }
 
     const clientId = crypto.randomUUID()
-    console.log(`CLIENT CONNECTED: ${clientId}`)
 
     if (!rooms.has(roomId)) {
         rooms.set(roomId, new Map())

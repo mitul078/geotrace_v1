@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 const RoomScreen = ({ onJoin }) => {
 
@@ -13,7 +13,7 @@ const RoomScreen = ({ onJoin }) => {
 
     const joinRoom = () => {
         if (!input.trim()) {
-            setError("ENTER ROOMID")
+            setError("ENTER_ROOM_ID")
             return
         }
         setError("")
@@ -28,11 +28,10 @@ const RoomScreen = ({ onJoin }) => {
             justifyContent: 'center',
             height: '100vh',
             gap: 16,
-            fontFamily: 'sans-serif',
             padding: 24,
-            background: '#f9fafb'
+            background: '#f4f9f9'
         }}>
-            <h2 style={{ margin: 0, fontSize: 24 }}>📍 Location Share</h2>
+            <h2 style={{ margin: 0, fontSize: 30, fontWeight: 600 }}>DEVICE LOCATION SHARING PLATFORM</h2>
             <p style={{ margin: 0, color: '#6b7280', textAlign: 'center' }}>
                 Create a room and share the ID with a friend
             </p>
@@ -41,7 +40,7 @@ const RoomScreen = ({ onJoin }) => {
                 Create New Room
             </button>
 
-            <p style={{ margin: 0, color: '#9ca3af' }}>— or join existing room —</p>
+            <p style={{ margin: 0, color: '#9ca3af' }}>- or join existing room</p>
 
             <input
                 placeholder="Paste Room ID here"
