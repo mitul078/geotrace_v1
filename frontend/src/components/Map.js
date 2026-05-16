@@ -1,6 +1,9 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import dynamic from 'next/dynamic'
+
+
 
 import "leaflet/dist/leaflet.css"
 import "leaflet-defaulticon-compatibility"
@@ -31,12 +34,6 @@ export default function Map({ roomId }) {
         if (!navigator.geolocation) return
 
         let cancelled = false
-        const wsUrl = process.env.NEXT_PUBLIC_WS_URL
-
-        // Fallback to localhost for development if env var is not set
-        if (!wsUrl) {
-            console.warn('NEXT_PUBLIC_WS_URL not set, using localhost fallback')
-        }
 
         const finalUrl ='wss://geo-trace-v1-server.onrender.com/ws'
         const ws = new WebSocket(`${finalUrl}?roomId=${roomId}`)
