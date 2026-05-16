@@ -31,10 +31,21 @@ export default function Map({ roomId }) {
         if (!navigator.geolocation) return
 
         let cancelled = false
-        const ws = new WebSocket(`ws://localhost:4001/ws?roomId=${roomId}`)
+        const wsUrl = process.env.NEXT_PUBLIC_WS_URL
+
+        // Fallback to localhost for development if env var is not set
+        if (!wsUrl) {
+            console.warn('NEXT_PUBLIC_WS_URL not set, using localhost fallback')
+        }
+
+        const finalUrl ='wss://geo-trace-v1-server.onrender.com/ws'
+        const ws = new WebSocket(`${finalUrl}?roomId=${roomId}`)
         let watchId
 
         ws.onopen = () => {
+            setConnected(true)
+            console.log('✅ WebSocket connected')
+
             watchId = navigator.geolocation.watchPosition(
                 (pos) => {
                     const { latitude, longitude } = pos.coords
@@ -42,7 +53,9 @@ export default function Map({ roomId }) {
 
                     if (!cancelled) setPosition([latitude, longitude])
                 },
-                (error) => console.log(error),
+                (error) => {
+                    console.error('Geolocation error:', error)
+                },
                 { maximumAge: 0, enableHighAccuracy: true, timeout: 5000 }
             )
         }
@@ -67,7 +80,12 @@ export default function Map({ roomId }) {
 
         ws.onclose = () => {
             setConnected(false)
-            console.log("WebSocket disconnected")
+            console.log("❌ WebSocket disconnected")
+        }
+
+        ws.onerror = (error) => {
+            console.error("❌ WebSocket error:", error)
+            setConnected(false)
         }
 
         return () => {
@@ -99,12 +117,14 @@ export default function Map({ roomId }) {
                         background: connected ? '#16a34a' : '#dc2626',
                         display: 'inline-block'
                     }}
+                    title={connected ? 'Connected' : 'Disconnected'}
                 />
                 <span>Room: <b>{roomId.slice(0, 8)}...</b></span>
                 <button onClick={copyRoomId} style={{
                     background: copied ? '#16a34a' : '#2563eb',
                     color: 'white', border: 'none', borderRadius: 6,
-                    padding: '4px 10px', cursor: 'pointer', fontSize: 12
+                    padding: '4px 10px', cursor: 'pointer', fontSize: 12,
+                    transition: 'all 0.2s'
                 }}>
                     {copied ? '✓ Copied!' : 'Copy ID'}
                 </button>
@@ -120,6 +140,8 @@ export default function Map({ roomId }) {
                 📍 You: {position[0].toFixed(5)}, {position[1].toFixed(5)}
                 <br />
                 👥 Others in room: {Object.keys(otherUsers).length}
+                <br />
+                {connected ? '🟢 Connected' : '🔴 Disconnected'}
             </div>
 
             <MapContainer
